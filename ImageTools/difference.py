@@ -15,9 +15,10 @@ def is_change(im0, im1, threshold=0.1, show_change=False):
 
         : param im0 : (np.array) 3D matrix of the values of the image
         : param im1 : (np.array) 3D matrix of the values of the image
-        : param thresh : (int) Percentage of pixels that changed to be considered a change
+        : param threshold : (int) Percentage of pixels that changed to be considered a change
         : param show_change : (bool) Show changes on image for visual debugging
         : return (Bool): If there is a change in the images
+        : return (np.array): Threshold image
     """
     # Check if images have the same dimensions.
     # Raise a ValueError otherwise
@@ -42,7 +43,7 @@ def is_change(im0, im1, threshold=0.1, show_change=False):
         show(im_change)
         print(f'{thresh.sum()} pixels changed of {np.prod(thresh.shape)}')
 
-    return changed > threshold
+    return changed > threshold, thresh
 
 
 
