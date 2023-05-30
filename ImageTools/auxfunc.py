@@ -3,6 +3,8 @@ Auxiliar functions for image tools
 
 JCA
 """
+import os
+
 import cv2
 import numpy as np
 
@@ -26,9 +28,14 @@ def automatic_contour(im, bck=2, convex_hull=True, **kwargs):
         gray = cv2.bitwise_not(gray)
     
     blur = cv2.GaussianBlur(gray,(3,3),0)
-    ret, th = cv2.threshold(blur, 10,255, cv2.THRESH_BINARY)#+cv2.THRESH_OTSU)
+    ret, th = cv2.threshold(blur, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     contours, hierarchy = cv2.findContours(th, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+    return get_hull(contours, convex_hull=convex_hull)
+
+
+def get_hull(contours, convex_hull=True):
+    """Return the largest contour"""
     hull = None
     hull_area = 0
     hull_center = None
@@ -46,8 +53,9 @@ def automatic_contour(im, bck=2, convex_hull=True, **kwargs):
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
             hull_center = (cX, cY)
-
+            
     return hull, hull_area, hull_center
+    
 
 
 def draw_contour(im, hull, hull_center, color=(0, 255, 0), thickness=2):
@@ -62,3 +70,13 @@ def show(im, window='window'):
     cv2.imshow(window,im)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+
+def create_out_dir(path):
+    output = path.split(os.sep)[-1]+'_out'
+
+    output_dir = os.path.join(os.sep.join(path.split(os.sep)[:-1]), output)
+    os.makedirs(output_dir, exist_ok=True)
+    print(f'    - Output directory: {output_dir}')
+
+    return output_dir

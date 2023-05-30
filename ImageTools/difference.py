@@ -4,10 +4,11 @@ Detect changes on a pair of images
 JCA
 """
 import numpy as np
+import cv2
 
 from ImageTools.auxfunc import show
 
-def is_change(im0, im1, threshold=0.1, show_change=False):
+def is_change(im0, im1, threshold=0.1, show_change=False, min_change=30):
     """Detect if there is a change between two images. The change is calculated by the absolute 
     difference between the images. If the change is greater than a value is counted as if the pixel changes.
     Return True if the number of pixels that changed are greated thant the thresh parameter.
@@ -17,6 +18,7 @@ def is_change(im0, im1, threshold=0.1, show_change=False):
         : param im1 : (np.array) 3D matrix of the values of the image
         : param threshold : (int) Percentage of pixels that changed to be considered a change
         : param show_change : (bool) Show changes on image for visual debugging
+        : param min_change : (int) Minimum pixel chamge to be considered 
         : return (Bool): If there is a change in the images
         : return (np.array): Threshold image
     """
@@ -26,8 +28,6 @@ def is_change(im0, im1, threshold=0.1, show_change=False):
         raise ValueError(f'Image dimension most be the same: Image sizes: {im0.shape} and {im0.shape}')
     
     diff = cv2.absdiff(im0, im1)
-
-    min_change = 30 # minimum chamge to be considered 
     diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
     thresh = cv2.threshold(
                 diff, min_change, 255,
@@ -43,7 +43,7 @@ def is_change(im0, im1, threshold=0.1, show_change=False):
         show(im_change)
         print(f'{thresh.sum()} pixels changed of {np.prod(thresh.shape)}')
 
-    return changed > threshold, thresh
+    return changed>threshold, thresh
 
 
 
@@ -52,8 +52,6 @@ def is_change(im0, im1, threshold=0.1, show_change=False):
 if __name__ == '__main__':
     """Use as an independent script"""
     import argparse
-
-    import cv2
 
     parser = argparse.ArgumentParser(
                     prog='IsChange',
