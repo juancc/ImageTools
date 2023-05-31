@@ -26,7 +26,7 @@ parser.add_argument('-s', '--size', help='Size of the side cropped area', defaul
 
 
 def main(path, size):
-    target_path = create_out_dir(path)
+    target_path = create_out_dir(path, tag='crop')
 
     # List of files with errors
     err = []

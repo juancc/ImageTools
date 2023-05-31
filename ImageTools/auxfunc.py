@@ -27,9 +27,12 @@ def automatic_contour(im, bck=2, convex_hull=True, **kwargs):
     if bck == 1: # white
         gray = cv2.bitwise_not(gray)
     
-    blur = cv2.GaussianBlur(gray,(3,3),0)
-    ret, th = cv2.threshold(blur, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    contours, hierarchy = cv2.findContours(th, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # blur = cv2.GaussianBlur(gray,(3,3),0)
+    ret, th = cv2.threshold(gray, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    dilation = cv2.dilate(th, (5,5), iterations=1)
+
+    contours, hierarchy = cv2.findContours(dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
 
     return get_hull(contours, convex_hull=convex_hull)
 
@@ -72,8 +75,8 @@ def show(im, window='window'):
     cv2.destroyAllWindows()
 
 
-def create_out_dir(path):
-    output = path.split(os.sep)[-1]+'_out'
+def create_out_dir(path, tag='out'):
+    output = path.split(os.sep)[-1]+f'_{tag}'
 
     output_dir = os.path.join(os.sep.join(path.split(os.sep)[:-1]), output)
     os.makedirs(output_dir, exist_ok=True)
