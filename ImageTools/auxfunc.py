@@ -80,3 +80,8 @@ def create_out_dir(path):
     print(f'    - Output directory: {output_dir}')
 
     return output_dir
+
+
+def blend(im1, im2, alpha):
+    """Alpha blend"""
+    return (1-alpha)*im1 + alpha*im2
