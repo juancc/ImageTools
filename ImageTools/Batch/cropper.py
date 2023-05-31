@@ -6,6 +6,7 @@ JCA
 """
 import os
 import argparse
+from pathlib import Path
 
 import cv2 as cv
 import numpy as np
@@ -26,29 +27,29 @@ parser.add_argument('-s', '--size', help='Size of the side cropped area', defaul
 
 
 def main(path, size):
-    target_path = create_out_dir(path, tag='crop')
+    output_dir = create_out_dir(path, tag='crop')
 
     # List of files with errors
     err = []
+    files = list(Path(path).glob('**/*'))
 
-    for p in tqdm(os.listdir(path)):
-        filepath = os.path.join(path, p)
-        name = p.split('.')[0]
-        target = os.path.join(target_path, name +'.'+ EXT)
-
+    for filepath in tqdm(files, total=len(files)):
         try:
-            im = cv.imread(filepath)
+            im = cv.imread(str(filepath))
             h,w,_ = im.shape
             x_i = int((h - size)/2)
             y_i = int((w - size)/2)
 
             im = im[x_i:x_i+size, y_i:y_i+size]
 
-            cv.imwrite(target, im)
-        except Exception as e:
-            err.append(p)
+            out_filename = f'{filepath.name.split(".")[0]}.png'
+            out_filepath = os.path.join(output_dir, out_filename)
 
-    print(f'Could not crop the next files: {p}')
+            cv.imwrite(out_filepath, im)
+        except Exception as e:
+            err.append(filepath.name)
+
+    print(f'Could not crop the next files: {err}')
 
 
 if __name__ == '__main__': 
