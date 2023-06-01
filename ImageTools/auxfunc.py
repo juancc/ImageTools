@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 
 
-def automatic_contour(im, bck=2, convex_hull=True, **kwargs):
+def automatic_contour(im, bck='white', convex_hull=True, **kwargs):
     """Contour is calculated automatic for images witout information
     Return object contour, area and centroid base background-object segmentation
         :param im: (np.array) image loaded for cv2
@@ -19,20 +19,30 @@ def automatic_contour(im, bck=2, convex_hull=True, **kwargs):
     gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
     # Invert colors if clear (white) background
-    if bck == 2: # Mixed
+    if bck == 'black':
         # Infer background color by the median
-        im_median = np.median(gray)
-        bck = 0 if im_median < 100 else 1
+        # im_median = np.median(gray)
+        # bck = 0 if im_median < 100 else 1
+        ret, th = cv2.threshold(gray, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
-    if bck == 1: # white
+    elif bck == 'white':
         gray = cv2.bitwise_not(gray)
-    
+        ret, th = cv2.threshold(gray, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+
+    elif bck == 'green':
+        # in LAB there are 2 color channels and 1 brightness channel:
+        #   L-channel: Brightness value in the image
+        #   A-channel: Red and green color in the image
+        #   B-channel: Blue and yellow color in the image
+        lab = cv2.cvtColor(im, cv2.COLOR_BGR2LAB)
+        a_channel = lab[:,:,1]
+        th = cv2.threshold(a_channel,127,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)[1]
+        th = cv2.bitwise_not(th)
+
+        
     # blur = cv2.GaussianBlur(gray,(3,3),0)
-    ret, th = cv2.threshold(gray, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     dilation = cv2.dilate(th, (5,5), iterations=1)
-
     contours, hierarchy = cv2.findContours(dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
 
     return get_hull(contours, convex_hull=convex_hull)
 
