@@ -18,16 +18,24 @@ def automatic_contour(im, bck='white', convex_hull=True, **kwargs):
     """
     gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
-    # Invert colors if clear (white) background
     if bck == 'black':
-        # Infer background color by the median
-        # im_median = np.median(gray)
-        # bck = 0 if im_median < 100 else 1
-        ret, th = cv2.threshold(gray, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        hsv = cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
+        min = np.array([0, 0, 0],np.uint8)
+        max = np.array([255, 170, 170],np.uint8)
+
+        th = cv2.inRange(hsv, min, max)
+        th = cv2.bitwise_not(th)
+
+        # ret, th = cv2.threshold(gray, 0,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
     elif bck == 'white':
-        gray = cv2.bitwise_not(gray)
-        ret, th = cv2.threshold(gray, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        # gray = cv2.bitwise_not(gray)
+        # ret, th = cv2.threshold(gray, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        hsv = cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
+        min = np.array([0, 30, 30],np.uint8)
+        max = np.array([255, 255, 255],np.uint8)
+
+        th = cv2.inRange(hsv, min, max)
 
     elif bck == 'green':
         # in LAB there are 2 color channels and 1 brightness channel:

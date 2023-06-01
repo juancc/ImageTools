@@ -13,11 +13,16 @@ import numpy as np
 from ImageTools.auxfunc import automatic_contour,\
       draw_contour, show, create_out_dir, blend
 
-def create_png(src, show_change=False, color=(255,255,255), bck_color='white'):
+def create_png(src, show_change=False, color=(255,255,255), bck_color='white', min_area=0.02):
     """Return a PNG image with automatic background detection
     : param bck_color: (Str) background color of the image, available: white, black, green 
+    : param min_area : (float) percentage of area to be considered
     """
-    hull, _, hull_center = automatic_contour(src, convex_hull=False, bck=bck_color)
+    hull, area, hull_center = automatic_contour(src, convex_hull=False, bck=bck_color)
+
+    
+    if area < np.prod(src.shape[:-1])*min_area:
+        return
 
     alpha = np.zeros(src.shape)
     alpha = draw_contour(alpha, hull, hull_center, color=(255,255,255), thickness=-1)
