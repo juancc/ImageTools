@@ -22,6 +22,7 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('path', help='Image path or directory containing images') 
 parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
+parser.add_argument('-c', '--color', help='Background color of the image, available: white, black, green ', default='white')
 
 
 
@@ -33,7 +34,7 @@ def main(path):
         try:
             im = cv2.imread(str(filepath))
 
-            out = create_png(im, show_change=args.show)
+            out = create_png(im, show_change=args.show, bck_color=args.color)
             out_filename = f'{filepath.name.split(".")[0]}.png'
             out_filepath = os.path.join(output_dir, out_filename)
 
