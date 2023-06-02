@@ -9,6 +9,28 @@ import cv2
 import numpy as np
 
 
+def auto_thresh(im):
+    """Get threshold mask fore remove background of an image based 
+    the mean and STD from each channel"""
+    hsv = cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
+        
+    hue_std = np.std(hsv[:,:,0])
+    hue_mean = np.mean(hsv[:,:,0])
+    sat_std = np.std(hsv[:,:,1])
+    sat_mean = np.mean(hsv[:,:,1])
+    val_std = np.std(hsv[:,:,2])
+    val_mean = np.mean(hsv[:,:,2])
+
+
+    min = np.array([hue_mean - hue_std, sat_mean - sat_std, val_mean - val_std],np.uint8)
+    max = np.array([hue_mean + hue_std, sat_mean + sat_std, val_mean + val_std],np.uint8)
+    th = cv2.inRange(hsv, min, max)
+
+    th = cv2.bitwise_not(th)
+    return th
+
+
+
 def automatic_contour(im, bck='white', convex_hull=True, **kwargs):
     """Contour is calculated automatic for images witout information
     Return object contour, area and centroid base background-object segmentation
@@ -29,13 +51,12 @@ def automatic_contour(im, bck='white', convex_hull=True, **kwargs):
         # ret, th = cv2.threshold(gray, 0,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
     elif bck == 'white':
-        # gray = cv2.bitwise_not(gray)
-        # ret, th = cv2.threshold(gray, 10,255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
         hsv = cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
+
         min = np.array([0, 30, 30],np.uint8)
         max = np.array([255, 255, 255],np.uint8)
-
         th = cv2.inRange(hsv, min, max)
+
 
     elif bck == 'green':
         # in LAB there are 2 color channels and 1 brightness channel:
@@ -46,6 +67,9 @@ def automatic_contour(im, bck='white', convex_hull=True, **kwargs):
         a_channel = lab[:,:,1]
         th = cv2.threshold(a_channel,127,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)[1]
         th = cv2.bitwise_not(th)
+
+    elif bck=='auto':
+        th = auto_thresh(im)
 
         
     # blur = cv2.GaussianBlur(gray,(3,3),0)

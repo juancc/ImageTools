@@ -20,7 +20,6 @@ def create_png(src, show_change=False, color=(255,255,255), bck_color='white', m
     """
     hull, area, hull_center = automatic_contour(src, convex_hull=False, bck=bck_color)
 
-    
     if area < np.prod(src.shape[:-1])*min_area:
         return
 
@@ -43,8 +42,6 @@ if __name__ == '__main__':
     import argparse
     from pathlib import Path
 
-    from tqdm import tqdm
-
     parser = argparse.ArgumentParser(
                     prog='CreatePNG',
                     description='Remove background from image')
@@ -57,7 +54,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     path = args.path
-
 
     im = cv2.imread(str(path))
 
