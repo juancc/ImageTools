@@ -24,9 +24,9 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('path', help='Source directory', type=str)
 parser.add_argument('-s', '--size', help='Size of the side cropped area', default=SIZE, type=int)
+parser.add_argument('-q', '--quality', help='Output file image quality', default=90)
 
-
-def main(path, size):
+def main(path, size, quality):
     output_dir = create_out_dir(path, tag='crop')
 
     # List of files with errors
@@ -45,7 +45,7 @@ def main(path, size):
             out_filename = f'{filepath.name.split(".")[0]}.png'
             out_filepath = os.path.join(output_dir, out_filename)
 
-            cv.imwrite(out_filepath, im)
+            cv.imwrite(out_filepath, im,  [int(cv.IMWRITE_JPEG_QUALITY), int(quality)])
         except Exception as e:
             err.append(filepath.name)
 
@@ -54,4 +54,4 @@ def main(path, size):
 
 if __name__ == '__main__': 
     args = parser.parse_args()
-    main(args.path, args.size)
+    main(args.path, args.size, args.quality)
