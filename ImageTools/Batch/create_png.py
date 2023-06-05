@@ -23,10 +23,11 @@ parser = argparse.ArgumentParser(
 parser.add_argument('path', help='Image path or directory containing images') 
 parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
 parser.add_argument('-c', '--color', help='Background color of the image, available: white, black, green ', default='white')
+parser.add_argument('-x', '--convex_hull', help='Get alpha channel with convex hull', action='store_true')
 
 
 
-def main(path):
+def main(path, args):
     output_dir = create_out_dir(path)
     files = list(Path(path).glob('**/*'))
     for filepath in tqdm(files, total=len(files)):
@@ -34,7 +35,7 @@ def main(path):
         try:
             im = cv2.imread(str(filepath))
 
-            out = create_png(im, show_change=args.show, bck_color=args.color)
+            out = create_png(im, show_change=args.show, bck_color=args.color, convex_hull=args.convex_hull)
             out_filename = f'{filepath.name.split(".")[0]}.png'
             out_filepath = os.path.join(output_dir, out_filename)
 
@@ -48,4 +49,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     path = args.path
 
-    main(path)
+    main(path, args)

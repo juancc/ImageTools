@@ -20,6 +20,7 @@ def create_png(src, show_change=False, color=(255,255,255), bck_color='white', m
     : param min_area : (float) Min percentage of area to be considered
     : param max_area : (float) Max percentage of area to be considered. Avoid saving
       images that does not have mask 
+    :param convex_hull : (Bool) Get alpha channel with convex hull
 
     """
     hull, area, hull_center = automatic_contour(src, convex_hull=convex_hull, bck=bck_color)
@@ -53,6 +54,7 @@ if __name__ == '__main__':
     parser.add_argument('path', help='Image path ') 
     parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
     parser.add_argument('-c', '--color', help='Background color of the image, available: white, black, green ', default='white')
+    parser.add_argument('-x', '--convex_hull', help='Get alpha channel with convex hull', action='store_true')
 
 
 
@@ -61,7 +63,7 @@ if __name__ == '__main__':
 
     im = cv2.imread(str(path))
 
-    out = create_png(im, show_change=args.show, bck_color=args.color)
+    out = create_png(im, show_change=args.show, bck_color=args.color, convex_hull=args.convex_hull)
     out_filepath = f'{path.split(".")[0]}_out.png'
 
     cv2.imwrite(out_filepath, out)
