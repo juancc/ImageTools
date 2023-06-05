@@ -77,7 +77,10 @@ def automatic_contour(im, bck='auto', convex_hull=True, **kwargs):
 
         th = auto_thresh(blur)
 
-        
+    else:
+        raise NameError(f'Background color: {bck} not implemented. Try: black, green, white, or auto')
+
+
     # blur = cv2.GaussianBlur(gray,(3,3),0)
     dilation = cv2.dilate(th, (5,5), iterations=1)
     contours, hierarchy = cv2.findContours(dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)

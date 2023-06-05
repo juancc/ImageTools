@@ -13,8 +13,11 @@ import numpy as np
 from ImageTools.auxfunc import automatic_contour,\
       draw_contour, show, create_out_dir, blend
 
-def create_png(src, show_change=False, color=(255,255,255), bck_color='white', min_area=0.05,\
-                max_area=0.95, convex_hull=False):
+MIN_AREA = 0.03
+MAX_AREA = 0.95
+
+def create_png(src, show_change=False, color=(255,255,255), bck_color='white', min_area=MIN_AREA,\
+                max_area=MAX_AREA, convex_hull=False):
     """Return a PNG image with automatic background detection
     : param bck_color: (Str) background color of the image, available: white, black, green 
     : param min_area : (float) Min percentage of area to be considered
