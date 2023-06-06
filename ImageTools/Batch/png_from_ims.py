@@ -1,8 +1,8 @@
 """
 Remove background of all the images in a folder
 Images most be in format:
-Foreground = name_1.jpg
-Background = name_0.jpg
+Foreground = name_0.jpg
+Background = name_1.jpg
 
 JCA
 """
@@ -35,8 +35,8 @@ def main(path, threshold):
     for n in tqdm(names):
         errs = []
         try:
-            bck = os.path.join(path, f'{n}_0{ext}')
-            fgd = os.path.join(path, f'{n}_1{ext}')
+            bck = os.path.join(path, f'{n}_1{ext}')
+            fgd = os.path.join(path, f'{n}_0{ext}')
 
             im0 = cv2.imread(bck)
             im1 = cv2.imread(fgd)
