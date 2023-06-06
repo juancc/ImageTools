@@ -13,19 +13,22 @@ def auto_thresh(im):
     """Get threshold mask fore remove background of an image based 
     the mean and STD from each channel"""
     hsv = cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
-        
-    hue_std = np.std(hsv[:,:,0])*1.5
+    # Increase hue contrast
+    hsv = np.power(hsv/255, 3) * 255
+
+    hue_std = np.std(hsv[:,:,0])#*1.5
     hue_mean = np.mean(hsv[:,:,0])
     # sat_std = np.std(hsv[:,:,1])
     # sat_mean = np.mean(hsv[:,:,1])
-    # val_std = np.std(hsv[:,:,2])
-    # val_mean = np.mean(hsv[:,:,2])
+    val_std = np.std(hsv[:,:,2])
+    val_mean = np.mean(hsv[:,:,2])
 
     # min = np.array([hue_mean - hue_std, sat_mean - sat_std, val_mean - val_std],np.uint8)
     # max = np.array([hue_mean + hue_std, sat_mean + sat_std, val_mean + val_std],np.uint8)
+
     
-    min = np.array([hue_mean - hue_std, 0, 0],np.uint8)
-    max = np.array([hue_mean + hue_std, 255, 255],np.uint8)
+    min = np.array([hue_mean - hue_std, 0, val_mean - val_std],np.uint8)
+    max = np.array([hue_mean + hue_std, 255,  val_mean + val_std],np.uint8)
     
     th = cv2.inRange(hsv, min, max)
     th = cv2.bitwise_not(th)
@@ -55,11 +58,10 @@ def automatic_contour(im, bck='auto', convex_hull=True, **kwargs):
     elif bck == 'white':
 
         hsv = cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
-        min = np.array([0, 30, 30],np.uint8)
-        max = np.array([255, 255, 255],np.uint8)
-        th = cv2.inRange(hsv, min, max)
 
-        # th = auto_thresh(im)
+        min = np.array([0, 30, 30],np.uint8) 
+        max = np.array([255, 255, 255],np.uint8) 
+        th = cv2.inRange(hsv, min, max)
 
 
     elif bck == 'green':
@@ -73,17 +75,17 @@ def automatic_contour(im, bck='auto', convex_hull=True, **kwargs):
         th = cv2.bitwise_not(th)
 
     elif bck=='auto':
-        blur = cv2.GaussianBlur(im,(5,5),0)
 
-        th = auto_thresh(blur)
+        # blur = cv2.GaussianBlur(im,(5,5),0)
+        th = auto_thresh(im)
 
     else:
         raise NameError(f'Background color: {bck} not implemented. Try: black, green, white, or auto')
 
 
     # blur = cv2.GaussianBlur(gray,(3,3),0)
-    dilation = cv2.dilate(th, (5,5), iterations=1)
-    contours, hierarchy = cv2.findContours(dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # dilation = cv2.dilate(th, (5,5), iterations=5)
+    contours, hierarchy = cv2.findContours(th, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     return get_hull(contours, convex_hull=convex_hull)
 

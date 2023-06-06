@@ -13,7 +13,7 @@ import numpy as np
 from ImageTools.auxfunc import automatic_contour,\
       draw_contour, show, create_out_dir, blend
 
-MIN_AREA = 0.03
+MIN_AREA = 0.05
 MAX_AREA = 0.95
 
 def create_png(src, show_change=False, color=(255,255,255), bck_color='white', min_area=MIN_AREA,\
