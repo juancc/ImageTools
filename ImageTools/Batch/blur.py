@@ -25,12 +25,12 @@ parser.add_argument('path', help='Image path or directory containing images')
 
 
 def main(path, args):
-    output_dir = create_out_dir(path)
+    output_dir = create_out_dir(path, tag='blur')
     files = list(Path(path).glob('**/*'))
     for filepath in tqdm(files, total=len(files)):
         err = []
         try:
-            im = cv2.imread(str(filepath))
+            im = cv2.imread(str(filepath), cv2.IMREAD_UNCHANGED)
 
             out = cv2.GaussianBlur(im,(5,5),0)
             out_filename = f'{filepath.name.split(".")[0]}.png'
