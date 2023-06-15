@@ -35,7 +35,7 @@ def main(path, size, quality):
 
     for filepath in tqdm(files, total=len(files)):
         try:
-            im = cv.imread(str(filepath))
+            im = cv.imread(str(filepath), cv.IMREAD_UNCHANGED)
             h,w,_ = im.shape
             x_i = int((h - size)/2)
             y_i = int((w - size)/2)
