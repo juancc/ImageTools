@@ -21,12 +21,13 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('path', help='Image path or directory containing images')
 parser.add_argument('-s', '--scale', help='Scale both widht and height', default=None)
+parser.add_argument('-q', '--quality', help='Output file image quality', default=90)
 
 
 
 
 
-def main(path, scale=None):
+def main(path, quality, scale=None):
     output_dir = create_out_dir(path, tag='resized')
     files = list(Path(path).glob('**/*'))
     for filepath in tqdm(files, total=len(files)):
@@ -53,7 +54,7 @@ def main(path, scale=None):
             out_filename = f'{filepath.name.split(".")[0]}.png'
             out_filepath = os.path.join(output_dir, out_filename)
 
-            cv2.imwrite(out_filepath, out)
+            cv2.imwrite(out_filepath, out, [int(cv2.IMWRITE_JPEG_QUALITY), int(quality)])
         except Exception as e:
             err.append(str(filepath))
 
@@ -64,5 +65,5 @@ if __name__ == '__main__':
     path = args.path
     scale = args.scale
 
-    main(path, scale=scale)
+    main(path, args.quality, scale=scale)
 
