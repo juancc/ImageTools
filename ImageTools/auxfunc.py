@@ -14,7 +14,7 @@ def auto_thresh(im):
     the mean and STD from each channel"""
     hsv = cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
     # Increase hue contrast
-    hsv = np.power(hsv/255, 3) * 255
+    # hsv = np.power(hsv/255, 3) * 255
 
     hue_std = np.std(hsv[:,:,0])#*1.5
     hue_mean = np.mean(hsv[:,:,0])
@@ -27,8 +27,8 @@ def auto_thresh(im):
     # max = np.array([hue_mean + hue_std, sat_mean + sat_std, val_mean + val_std],np.uint8)
 
     
-    min = np.array([hue_mean - hue_std, 0, val_mean - val_std],np.uint8)
-    max = np.array([hue_mean + hue_std, 255,  val_mean + val_std],np.uint8)
+    min = np.array([hue_mean - hue_std, 0, 0],np.uint8)
+    max = np.array([hue_mean + hue_std, 255, 255],np.uint8)
     
     th = cv2.inRange(hsv, min, max)
     th = cv2.bitwise_not(th)
