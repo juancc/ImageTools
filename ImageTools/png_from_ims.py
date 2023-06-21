@@ -11,7 +11,7 @@ from ImageTools.auxfunc import show, draw_contour, get_hull
 
 
 
-def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, color=(255,255,255), crop=False):
+def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, color=(255,255,255), crop=False, keep_bg=False):
     """Create a PNG image from two images using their absolute difference.
         : param im0 : (np.array) background
         : param im1 : (np.array) Image to remove background
@@ -43,8 +43,9 @@ def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, color=(255,2
         show(im_change)
 
     # Remove other pixels of background
-    neg_alpha = -1*(alpha/255 -1)
-    fgd[neg_alpha.astype(bool)] = color
+    if not keep_bg:
+        neg_alpha = -1*(alpha/255 -1)
+        fgd[neg_alpha.astype(bool)] = color
 
     # Image with alpha channel
     out = np.dstack([fgd, alpha])
@@ -77,6 +78,8 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--threshold', help='Percentage of pixels that changed to be considered a change', default=0.1)
     parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
     parser.add_argument('-c', '--crop', help='Crop image around largest contour', action='store_true')
+    parser.add_argument('-b', '--background', help='Keep image background', action='store_true')
+
 
 
 
@@ -87,7 +90,7 @@ if __name__ == '__main__':
     im0 = cv2.imread(args.im0)
     im1 = cv2.imread(args.im1)
 
-    ret, ans = create_png_from_ims(im0, im1, threshold=float(args.threshold), show_change=args.show, crop=args.crop)
+    ret, ans = create_png_from_ims(im0, im1, threshold=float(args.threshold), show_change=args.show, crop=args.crop, keep_bg=args.background)
 
     out_filepath = f'{args.im0.split(".")[0]}_out.png'
 
