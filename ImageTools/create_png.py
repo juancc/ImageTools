@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     parser.add_argument('path', help='Image path ') 
     parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
-    parser.add_argument('-c', '--color', help='Background color of the image, available: white, black, green ', default='white')
+    parser.add_argument('-c', '--color', help='Background color of the image, available: white, black, green or auto', default='auto')
     parser.add_argument('-x', '--convex_hull', help='Get alpha channel with convex hull', action='store_true')
 
 
