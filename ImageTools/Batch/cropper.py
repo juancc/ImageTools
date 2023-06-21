@@ -1,32 +1,39 @@
 """
 Crop all the images in folder
-The crop is cententered and squared
+Area specifications:
+ - size: The crop is cententered and squared
+ - yrange: Range of the image in the y axis
+
 
 JCA
 """
 import os
 import argparse
 from pathlib import Path
+from ast import literal_eval
 
-import cv2 as cv
+import cv2
 import numpy as np
 from tqdm import tqdm
 
-from ImageTools.auxfunc import create_out_dir
 
-# Square side size of the cropped area
-SIZE = 100
-EXT = 'jpg'
+from ImageTools.auxfunc import create_out_dir
+from ImageTools.cropper import cropper
+
 
 parser = argparse.ArgumentParser(
                     prog = 'Folder Image Cropper',
                     description = 'Crop all images in folder')
 
 parser.add_argument('path', help='Source directory', type=str)
-parser.add_argument('-s', '--size', help='Size of the side cropped area', default=SIZE, type=int)
+parser.add_argument('-s', '--size', help='Size of the side cropped area centered on the image', 
+                    default=None)
+parser.add_argument('-y', '--yrange', help='Range of image in y axis (y_init,y_final)', 
+                    default=None)
 parser.add_argument('-q', '--quality', help='Output file image quality', default=90)
 
-def main(path, size, quality):
+
+def main(path, size, y_range, quality):
     output_dir = create_out_dir(path, tag='crop')
 
     # List of files with errors
@@ -35,17 +42,12 @@ def main(path, size, quality):
 
     for filepath in tqdm(files, total=len(files)):
         try:
-            im = cv.imread(str(filepath), cv.IMREAD_UNCHANGED)
-            h,w,_ = im.shape
-            x_i = int((h - size)/2)
-            y_i = int((w - size)/2)
-
-            im = im[x_i:x_i+size, y_i:y_i+size]
+            im = cropper(filepath, size=size, y_range=y_range)
 
             out_filename = f'{filepath.name.split(".")[0]}.png'
             out_filepath = os.path.join(output_dir, out_filename)
 
-            cv.imwrite(out_filepath, im,  [int(cv.IMWRITE_JPEG_QUALITY), int(quality)])
+            cv2.imwrite(out_filepath, im,  [int(cv2.IMWRITE_JPEG_QUALITY), int(quality)])
         except Exception as e:
             err.append(filepath.name)
 
@@ -54,4 +56,9 @@ def main(path, size, quality):
 
 if __name__ == '__main__': 
     args = parser.parse_args()
-    main(args.path, args.size, args.quality)
+
+    # If size provided crop will be square centered on the image
+    size = int(args.size) if args.size else None
+    y_range = literal_eval(args.yrange) if args.yrange else None
+
+    main(args.path, size, y_range, args.quality)
