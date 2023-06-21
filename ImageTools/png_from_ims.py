@@ -11,7 +11,7 @@ from ImageTools.auxfunc import show, draw_contour, get_hull
 
 
 
-def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, color=(255,255,255), crop=False, keep_bg=False):
+def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, color=(255,255,255), crop=False, keep_bg=False, hull=False):
     """Create a PNG image from two images using their absolute difference.
         : param im0 : (np.array) background
         : param im1 : (np.array) Image to remove background
@@ -32,7 +32,7 @@ def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, color=(255,2
 
     # Find contours to only get the largest one
     contours, hierarchy = cv2.findContours(dilation.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    hull, hull_area, hull_center, main_contour = get_hull(contours, convex_hull=False)
+    hull, hull_area, hull_center, main_contour = get_hull(contours, convex_hull=hull)
     
     alpha = np.zeros(fgd.shape)
     alpha = draw_contour(alpha, hull, hull_center, color=255, thickness=-1)[:,:,0]
@@ -79,6 +79,8 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
     parser.add_argument('-c', '--crop', help='Crop image around largest contour', action='store_true')
     parser.add_argument('-b', '--background', help='Keep image background', action='store_true')
+    parser.add_argument('-u', '--hull', help='Use convex hull for mask generation', action='store_true')
+
 
 
 
@@ -90,7 +92,9 @@ if __name__ == '__main__':
     im0 = cv2.imread(args.im0)
     im1 = cv2.imread(args.im1)
 
-    ret, ans = create_png_from_ims(im0, im1, threshold=float(args.threshold), show_change=args.show, crop=args.crop, keep_bg=args.background)
+    ret, ans = create_png_from_ims(im0, im1, threshold=float(args.threshold), 
+                                   show_change=args.show, crop=args.crop, keep_bg=args.background,
+                                   hull=args.hull)
 
     out_filepath = f'{args.im0.split(".")[0]}_out.png'
 
