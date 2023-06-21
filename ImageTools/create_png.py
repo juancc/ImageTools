@@ -26,7 +26,7 @@ def create_png(src, show_change=False, color=(255,255,255), bck_color='white', m
     :param convex_hull : (Bool) Get alpha channel with convex hull
 
     """
-    hull, area, hull_center = automatic_contour(src, convex_hull=convex_hull, bck=bck_color)
+    hull, area, hull_center, main_contour = automatic_contour(src, convex_hull=convex_hull, bck=bck_color)
 
     if area < np.prod(src.shape[:-1])*min_area or area > np.prod(src.shape[:-1])*max_area:
         return

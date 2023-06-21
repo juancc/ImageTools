@@ -95,6 +95,7 @@ def get_hull(contours, convex_hull=True):
     hull = None
     hull_area = 0
     hull_center = None
+    main_contour = contours[0]
     # Only consider the larges convex hull of the image
     for c in contours:
         # calculate moments for each contour
@@ -109,8 +110,10 @@ def get_hull(contours, convex_hull=True):
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
             hull_center = (cX, cY)
+
+            main_contour = c
             
-    return hull, hull_area, hull_center
+    return hull, hull_area, hull_center, main_contour
     
 
 

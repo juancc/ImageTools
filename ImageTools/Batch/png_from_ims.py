@@ -23,9 +23,10 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('path', help='Image path or directory containing images') 
 parser.add_argument('-t', '--threshold', help='Percentage of pixels that changed to be considered a change', default=0.1)
+parser.add_argument('-c', '--crop', help='Crop image around largest contour', action='store_true')
 
 
-def main(path, threshold):
+def main(path, crop, threshold):
     output_dir = create_out_dir(path)
     files = list(Path(path).glob('**/*'))
     names = set([f.name.split('_')[0] for f in files if not f.name.startswith('.')])
@@ -35,13 +36,13 @@ def main(path, threshold):
     for n in tqdm(names):
         errs = []
         try:
-            bck = os.path.join(path, f'{n}_1{ext}')
-            fgd = os.path.join(path, f'{n}_0{ext}')
+            bck = os.path.join(path, f'{n}_0{ext}')
+            fgd = os.path.join(path, f'{n}_1{ext}')
 
             im0 = cv2.imread(bck)
             im1 = cv2.imread(fgd)
 
-            ret, out = create_png_from_ims(im0, im1, threshold=threshold)
+            ret, out = create_png_from_ims(im0, im1, threshold=threshold, crop=crop)
             if ret:
                 out_filepath = os.path.join(output_dir, f'{n}_3.png')
 
@@ -54,4 +55,4 @@ def main(path, threshold):
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    main(args.path, threshold=float(args.threshold))
+    main(args.path, args.crop, threshold=float(args.threshold))

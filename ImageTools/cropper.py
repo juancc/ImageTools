@@ -28,7 +28,7 @@ def cropper(filepath, size=None, y_range=None):
         xi = int((h - size)/2)
         yi = int((w - size)/2)
 
-        im = im[xi:xi+size, yi:yi+size]
+        im = im[yi:yi+size, xi:xi+size]
     elif y_range:
         im = im[y_range[0]:y_range[1], 0:w]
 
