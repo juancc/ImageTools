@@ -31,9 +31,11 @@ parser.add_argument('-s', '--size', help='Size of the side cropped area centered
 parser.add_argument('-y', '--yrange', help='Range of image in y axis (y_init,y_final)', 
                     default=None)
 parser.add_argument('-q', '--quality', help='Output file image quality', default=90)
+parser.add_argument('-a', '--auto', help='Crop automatic based alpha channel', action='store_true')
 
 
-def main(path, size, y_range, quality):
+
+def main(path, size, y_range, auto, quality):
     output_dir = create_out_dir(path, tag='crop')
 
     # List of files with errors
@@ -42,7 +44,7 @@ def main(path, size, y_range, quality):
 
     for filepath in tqdm(files, total=len(files)):
         try:
-            im = cropper(filepath, size=size, y_range=y_range)
+            im = cropper(filepath, size=size, y_range=y_range, auto=auto)
 
             out_filename = f'{filepath.name.split(".")[0]}.png'
             out_filepath = os.path.join(output_dir, out_filename)
@@ -61,4 +63,4 @@ if __name__ == '__main__':
     size = int(args.size) if args.size else None
     y_range = literal_eval(args.yrange) if args.yrange else None
 
-    main(args.path, size, y_range, args.quality)
+    main(args.path, size, y_range, args.auto, args.quality)
