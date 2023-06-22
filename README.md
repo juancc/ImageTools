@@ -11,7 +11,7 @@ Run the scripts following the next pattern:
 ## Create PNG (Alpha-mated images)
 Generate a transparency image and save as PNG. Automatic background subtraction from plain colors. Four backround colors: White, black, green and auto. Im auto mode: the foreground detection is based on the most common color of the image. Example auto mode transparency generator:
 
-![alt text](https://github.com/juancc/ImageTools/blob/main/ex_create_png.jpg?raw=true)
+![alt text](https://github.com/juancc/ImageTools/blob/main/Assets/Img/ex_create_png.jpg?raw=true)
 
  
 
