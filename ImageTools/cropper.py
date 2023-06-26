@@ -19,7 +19,7 @@ from tqdm import tqdm
 from ImageTools.auxfunc import get_hull
 
 
-def cropper(filepath, size=None, y_range=None, auto=False):
+def cropper(filepath, size=None, y_range=None, x_range=None, auto=False):
     """Crop image in different modes:
         :param size: Squared centered on the image with side as size
         :param y_range: (yi,yf) range of the image in y axis 
@@ -33,6 +33,9 @@ def cropper(filepath, size=None, y_range=None, auto=False):
         im = im[yi:yi+size, xi:xi+size]
     elif y_range:
         im = im[y_range[0]:y_range[1], 0:w]
+    elif x_range:
+        im = im[0:h, x_range[0]:x_range[1]]
+
     elif auto:
         # TODO:
         # Check if input image has alpha channel
@@ -64,7 +67,8 @@ if __name__ == '__main__':
                         default=None)
     parser.add_argument('-q', '--quality', help='Output file image quality', default=90)
     parser.add_argument('-a', '--auto', help='Crop automatic based alpha channel', action='store_true')
-
+    parser.add_argument('-x', '--xrange', help='Range of image in x axis (x_init, x_final)', 
+                    default=None)
 
 
     args = parser.parse_args()
@@ -72,8 +76,10 @@ if __name__ == '__main__':
     # If size provided crop will be square centered on the image
     size = int(args.size) if args.size else None
     y_range = literal_eval(args.yrange) if args.yrange else None
+    x_range = literal_eval(args.xrange) if args.xrange else None
 
-    im = cropper(args.path, size=size, y_range=y_range, auto=args.auto)
+
+    im = cropper(args.path, size=size, y_range=y_range, x_range=x_range, auto=args.auto)
 
     out_filepath = f'{args.path.split(".")[0]}_crop.png'
 

@@ -28,7 +28,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument('path', help='Source directory', type=str)
 parser.add_argument('-s', '--size', help='Size of the side cropped area centered on the image', 
                     default=None)
-parser.add_argument('-y', '--yrange', help='Range of image in y axis (y_init,y_final)', 
+parser.add_argument('-y', '--yrange', help='Range of image in y axis (y_init, y_final)', 
+                    default=None)
+parser.add_argument('-x', '--xrange', help='Range of image in x axis (x_init, x_final)', 
                     default=None)
 parser.add_argument('-q', '--quality', help='Output file image quality', default=90)
 parser.add_argument('-a', '--auto', help='Crop automatic based alpha channel', action='store_true')
@@ -44,7 +46,7 @@ def main(path, size, y_range, auto, quality):
 
     for filepath in tqdm(files, total=len(files)):
         try:
-            im = cropper(filepath, size=size, y_range=y_range, auto=auto)
+            im = cropper(filepath, size=size, y_range=y_range, x_range=x_range, auto=auto)
 
             out_filename = f'{filepath.name.split(".")[0]}.png'
             out_filepath = os.path.join(output_dir, out_filename)
@@ -62,5 +64,7 @@ if __name__ == '__main__':
     # If size provided crop will be square centered on the image
     size = int(args.size) if args.size else None
     y_range = literal_eval(args.yrange) if args.yrange else None
+    x_range = literal_eval(args.xrange) if args.xrange else None
 
-    main(args.path, size, y_range, args.auto, args.quality)
+
+    main(args.path, size, y_range, x_range, args.auto, args.quality)
