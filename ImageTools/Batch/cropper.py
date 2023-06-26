@@ -37,7 +37,7 @@ parser.add_argument('-a', '--auto', help='Crop automatic based alpha channel', a
 
 
 
-def main(path, size, y_range, auto, quality):
+def main(path, size, y_range, x_range, auto, quality):
     output_dir = create_out_dir(path, tag='crop')
 
     # List of files with errors
