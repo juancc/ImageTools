@@ -19,24 +19,26 @@ from tqdm import tqdm
 from ImageTools.auxfunc import get_hull
 
 
-def cropper(filepath, size=None, y_range=None, x_range=None, auto=False):
+def cropper(filepath, size=False, y_range=False, x_range=False, auto=False):
     """Crop image in different modes:
         :param size: Squared centered on the image with side as size
         :param y_range: (yi,yf) range of the image in y axis 
     """
     im = cv2.imread(str(filepath), cv2.IMREAD_UNCHANGED)
     h,w,_ = im.shape
+
+    if y_range:
+        im = im[y_range[0]:y_range[1], 0:w]
+    if x_range:
+        im = im[0:h, x_range[0]:x_range[1]]
+
     if size:
         xi = int((h - size)/2)
         yi = int((w - size)/2)
 
         im = im[yi:yi+size, xi:xi+size]
-    elif y_range:
-        im = im[y_range[0]:y_range[1], 0:w]
-    elif x_range:
-        im = im[0:h, x_range[0]:x_range[1]]
-
-    elif auto:
+    
+    if auto:
         # TODO:
         # Check if input image has alpha channel
         alpha = im[:,:,-1]
@@ -47,8 +49,7 @@ def cropper(filepath, size=None, y_range=None, x_range=None, auto=False):
 
         im = im[y:y+h, x:x+w]
         
-
-    else:
+    if not (size or y_range or x_range or auto) :
         print('Area to crop not provided')
         exit()
     

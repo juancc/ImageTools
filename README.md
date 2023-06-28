@@ -74,15 +74,19 @@ python -m ImageTools.Batch.ImageResize [-h] [-s SCALE] [-q QUALITY] path
 ```
 
 ### Positional arguments:
+
 >  __path__                                       Image path or directory containing images
 
 ### Optional arguments:
+
 >  __-s SCALE__, --scale               Scale both widht and height
 >                        
 >  __-q QUALITY__, --quality        Output file image quality
 >                        
 
+
 ## PNG from images
 Generate a transparency image by removing the background using two images (Background and Foreground) and save as PNG. 
+
 
 
