@@ -31,7 +31,7 @@ python -m ImageTools.Batch.png_from_ims  [-s] [-c COLOR] [-x] path
 > __-x__, --convex_hull        Get alpha channel with convex hull
 
 
-----
+
 ## Cropper
 Batch crop part of all the images located in a folder and subfolders. There are available 4 ways to crop the images:
 - Square centered: crop a square centered of the image with a specified size 
@@ -65,10 +65,24 @@ python -m ImageTools.Batch.cropper [-s SIZE] [-y YRANGE] [-x XRANGE] [-q QUALITY
 
 
 
-----
 ## Resize
+Scale all the images inside folder and subfolders. This script creates a new folder in the same location with the same name plus '_resized'. 
+
+### Usage:
+```bash
+python -m ImageTools.Batch.ImageResize [-h] [-s SCALE] [-q QUALITY] path
+```
+
+### Positional arguments:
+>  __path__                                       Image path or directory containing images
+
+### Optional arguments:
+>  __-s SCALE__, --scale               Scale both widht and height
+>                        
+>  __-q QUALITY__, --quality        Output file image quality
+>                        
 
 ## PNG from images
-
+Generate a transparency image by removing the background using two images (Background and Foreground) and save as PNG. 
 
 
