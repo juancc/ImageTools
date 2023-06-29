@@ -11,7 +11,9 @@ from ImageTools.auxfunc import show, draw_contour, get_hull
 
 
 
-def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, color=(255,255,255), crop=False, keep_bg=False, hull=False):
+def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, 
+                        color=(255,255,255), crop=False, keep_bg=False, hull=False,
+                        min_change=50):
     """Create a PNG image from two images using their absolute difference.
         : param im0 : (np.array) background
         : param im1 : (np.array) Image to remove background
@@ -19,8 +21,10 @@ def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, color=(255,2
         : param show_change : (bool) Show changes on image for visual debugging
         : param color : (tuple) color to replace the background
         : param crop : (bool) crop image arround largest contour
+        : param min_change : (int) Minimum pixel chamge to be considered 
+
     """
-    ret, thresh = is_change(bck, fgd, threshold=threshold, min_change=30)
+    ret, thresh = is_change(bck, fgd, threshold=threshold, min_change=min_change)
 
     # If there is not change return None
     if not ret:
@@ -76,6 +80,8 @@ if __name__ == '__main__':
     parser.add_argument('im1', help='Foreground') 
 
     parser.add_argument('-t', '--threshold', help='Percentage of pixels that changed to be considered a change', default=0.1)
+    parser.add_argument('-m', '--min', help=' Minimum pixel chamge to be considered ', default=50)
+
     parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
     parser.add_argument('-c', '--crop', help='Crop image around largest contour', action='store_true')
     parser.add_argument('-b', '--background', help='Keep image background', action='store_true')
@@ -94,7 +100,8 @@ if __name__ == '__main__':
 
     ret, ans = create_png_from_ims(im0, im1, threshold=float(args.threshold), 
                                    show_change=args.show, crop=args.crop, keep_bg=args.background,
-                                   hull=args.hull)
+                                   hull=args.hull,
+                                   min_change=int(args.min))
 
     out_filepath = f'{args.im0.split(".")[0]}_out.png'
 
