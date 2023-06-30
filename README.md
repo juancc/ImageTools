@@ -17,7 +17,7 @@ Generate a transparency image and save as PNG. Automatic background subtraction 
 
  ### Usage
 ```bash
-python -m ImageTools.Batch.png_from_ims  [-s] [-c COLOR] [-x] path
+python -m ImageTools.Batch.create_png  [-s] [-c COLOR] [-x] path
 ```
 
 ### Positional arguments:
@@ -70,7 +70,7 @@ Scale all the images inside folder and subfolders. This script creates a new fol
 
 ### Usage:
 ```bash
-python -m ImageTools.Batch.ImageResize [-h] [-s SCALE] [-q QUALITY] path
+python -m ImageTools.Batch.resize [-h] [-s SCALE] [-q QUALITY] path
 ```
 
 ### Positional arguments:
@@ -88,5 +88,50 @@ python -m ImageTools.Batch.ImageResize [-h] [-s SCALE] [-q QUALITY] path
 ## PNG from images
 Generate a transparency image by removing the background using two images (Background and Foreground) and save as PNG. 
 
+![alt text](https://github.com/juancc/ImageTools/blob/main/Assets/Img/ex_png_from_ims.png?raw=true)
+
+### Usage: 
+```bash
+python -m ImageTools.png_from_ims [-h] [-t THRESHOLD] [-m MIN] [-s] [-c] [-b] [-u] im0 im1
+```
 
 
+### Positional arguments:
+>  __im0__                                   Path to background image
+>
+>  __im1__                                   Path to foreground image
+
+
+### Optional arguments:
+
+
+>  __-t THRESHOLD__, --threshold             Percentage of pixels that changed to be considered a change
+>
+>                        
+>  __-m MIN__, --min                                     Minimum pixel chamge to be considered
+>
+>  __-s__, --show                                           Show changes on image for visual debugging
+>
+>  __-c__, --crop                                            Crop image around largest contour
+>
+>  __-b__, --background                               Keep image background
+>
+>  __-u__, --hull                                             Use convex hull for mask generation
+
+
+When used for batch processing the images inside the folders the name most be ended in '_0' in background and '_1' and the same arguments are available.
+
+## Blur
+Add gaussian blur to all images located in folder and subfolders. Creates an output folder located in the same root location with the same as the source. 
+
+### Usage:
+```bash
+python -m ImageTools.Batch.blur [-h] [-k KERNELSIZE] path
+```
+
+### Positional arguments:
+>  __path__                  Image path or directory containing images
+
+
+### Optional arguments:
+>  __-k KERNELSIZE__, --kernelSize             Blur filter kernel size (k,k)
