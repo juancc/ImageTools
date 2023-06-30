@@ -27,16 +27,17 @@ def is_change(im0, im1, threshold=0.1, show_change=False, min_change=50):
     if im0.shape != im1.shape:
         raise ValueError(f'Image dimension most be the same: Image sizes: {im0.shape} and {im0.shape}')
     
-    hsv0 = cv2.cvtColor(im0, cv2.COLOR_BGR2HSV)
-    hsv1 = cv2.cvtColor(im1, cv2.COLOR_BGR2HSV)
+    # # HSV Version
+    # hsv0 = cv2.cvtColor(im0, cv2.COLOR_BGR2HSV)
+    # hsv1 = cv2.cvtColor(im1, cv2.COLOR_BGR2HSV)
+    # diff = cv2.absdiff(hsv0[:,:,:-1], hsv1[:,:,:-1])
+    # diff = np.max(diff, axis=2)
 
-
-    diff = cv2.absdiff(hsv0[:,:,:-1], hsv1[:,:,:-1])
-
-    diff = np.max(diff, axis=2)
-
-    # diff = cv2.absdiff(im0, im1)
-    # diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+    # # RGB version
+    diff = cv2.absdiff(im0, im1)
+    diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+    
+    
     thresh = cv2.threshold(
                 diff, min_change, 255,
                 cv2.THRESH_BINARY)[1]/255
