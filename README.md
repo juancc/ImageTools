@@ -135,3 +135,32 @@ python -m ImageTools.Batch.blur [-h] [-k KERNELSIZE] path
 
 ### Optional arguments:
 >  __-k KERNELSIZE__, --kernelSize             Blur filter kernel size (k,k)
+
+
+## Crop image change
+Creates a new image by cropping the area of foreground that changes between foreground and background.
+
+![alt text](https://github.com/juancc/ImageTools/blob/main/Assets/Img/ex_crop_change.png?raw=true)
+
+
+### Usage: 
+```bash
+ python -m ImageTools.Batch.crop_change [-h] [-t THRESHOLD] [-m MIN] [-s] [-u] im0 im1
+```
+
+### Positional arguments:
+>  __im0__                                                      Path to background image
+>
+>  __im1__                                                      Path to foreground image
+
+
+### Optional arguments:
+
+>  __-t THRESHOLD__, --threshold             Percentage of pixels that changed to be considered a change
+>
+>                        
+>  __-m MIN__, --min                                     Minimum pixel chamge to be considered
+>
+>  __-s__, --show                                            Show changes on image for visual debugging
+>
+>  __-u__, --hull                                               Use convex hull for mask generation
