@@ -8,7 +8,7 @@ import cv2
 
 from ImageTools.auxfunc import show
 
-def is_change(im0, im1, threshold=0.1, show_change=False, min_change=50):
+def is_change(im0, im1, threshold=0.1, show_change=False, min_change=30):
     """Detect if there is a change between two images. The change is calculated by the absolute 
     difference between the images. If the change is greater than a value is counted as if the pixel changes.
     Return True if the number of pixels that changed are greated thant the thresh parameter.

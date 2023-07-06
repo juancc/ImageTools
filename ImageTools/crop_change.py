@@ -1,8 +1,9 @@
 """
-Create PNG from two images: remove background from image difference
+Crop part of the image that changed in two images
 
 JCA
 """
+
 import numpy as np
 import cv2
 
@@ -11,8 +12,7 @@ from ImageTools.auxfunc import show, draw_contour, get_hull
 
 
 
-def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, 
-                        color=(255,255,255), crop=False, keep_bg=False, hull=False,
+def crop_change(bck, fgd, threshold=0.1, show_change=False, hull=False,
                         min_change=30):
     """Create a PNG image from two images using their absolute difference.
         : param im0 : (np.array) background
@@ -38,29 +38,20 @@ def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False,
     contours, hierarchy = cv2.findContours(dilation.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     hull, hull_area, hull_center, main_contour = get_hull(contours, convex_hull=hull)
     
-    alpha = np.zeros(fgd.shape)
-    alpha = draw_contour(alpha, hull, hull_center, color=255, thickness=-1)[:,:,0]
 
     if show_change:
+        alpha = np.zeros(fgd.shape)
+        alpha = draw_contour(alpha, hull, hull_center, color=255, thickness=-1)[:,:,0]
         im_change = np.array(fgd)
         im_change[alpha.astype(bool)] = (0,255,0)
         show(im_change)
 
-    # Remove other pixels of background
-    if not keep_bg:
-        neg_alpha = -1*(alpha/255 -1)
-        fgd[neg_alpha.astype(bool)] = color
-
-    # Image with alpha channel
-    out = np.dstack([fgd, alpha])
-
     # Crop around largest contour
-    if crop:
-        x,y,w,h  = cv2.boundingRect(main_contour)
-        if show_change:
-            cv2.rectangle(fgd,(x,y),(x+w,y+h),(0,255,0),2)
-            show(fgd)
-        out = out[y:y+h, x:x+w]
+    x,y,w,h  = cv2.boundingRect(main_contour)
+    if show_change:
+        cv2.rectangle(fgd,(x,y),(x+w,y+h),(0,255,0),2)
+        show(fgd)
+    out = fgd[y:y+h, x:x+w]
 
     return True, out
 
@@ -73,8 +64,8 @@ if __name__ == '__main__':
 
 
     parser = argparse.ArgumentParser(
-                    prog='PNGfromIMS',
-                    description='Create PNG from two images: remove background from image difference')
+                    prog='CropChange',
+                    description='Crop images based the change of of background foreground')
 
     parser.add_argument('im0', help='Background')
     parser.add_argument('im1', help='Foreground') 
@@ -83,12 +74,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--min', help=' Minimum pixel chamge to be considered ', default=30)
 
     parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
-    parser.add_argument('-c', '--crop', help='Crop image around largest contour', action='store_true')
-    parser.add_argument('-b', '--background', help='Keep image background', action='store_true')
     parser.add_argument('-u', '--hull', help='Use convex hull for mask generation', action='store_true')
-
-
-
 
 
 
@@ -98,13 +84,11 @@ if __name__ == '__main__':
     im0 = cv2.imread(args.im0)
     im1 = cv2.imread(args.im1)
 
-    ret, ans = create_png_from_ims(im0, im1, threshold=float(args.threshold), 
-                                   show_change=args.show, crop=args.crop, keep_bg=args.background,
+    ret, ans = crop_change(im0, im1, threshold=float(args.threshold), 
+                                   show_change=args.show,
                                    hull=args.hull,
                                    min_change=int(args.min))
 
     out_filepath = f'{args.im0.split(".")[0]}_out.png'
 
     if ret: cv2.imwrite(out_filepath, ans)
-
-
