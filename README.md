@@ -1,7 +1,8 @@
 # ImageTools
-Console tools for image processing. The ImageTools repository contains scripts for perfoming:
+Collection of console tools for image processing. The ImageTools repository contains scripts for perfoming:
 - Individual image processing located under ImageTools 
 - Batch processing: the scripts perform a transformation of all the images inside a folder and subfolders. The result are placed inside a new folder with the same name as the source directoru plus '_out'. The scripts are located on ImageTools/Batch.
+- Datasets: Tools for Machine Learning image datasets processing. 
 
 Run the scripts following the next pattern:
 
@@ -9,7 +10,9 @@ Run the scripts following the next pattern:
 python -m ImageTools.Batch.script_name -A --args /image/path.png
 ```
 
-# Tools
+# Batch Tools
+Scripts for performing image processing of all the images located under a folder and sub-folders.
+
 ## Create PNG (Alpha-mated images)
 Generate a transparency image and save as PNG. Automatic background subtraction from plain colors. Four backround colors: White, black, green and auto. Im auto mode: the foreground detection is based on the most common color of the image. Example auto mode transparency generator:
 
@@ -164,3 +167,12 @@ Creates a new image by cropping the area of foreground that changes between fore
 >  __-s__, --show                                            Show changes on image for visual debugging
 >
 >  __-u__, --hull                                               Use convex hull for mask generation
+
+
+
+# Dataset Tools
+
+Tools for Machine Learning image datasets processing. 
+
+## Png from COCO
+Generate transparency image using COCO segmentation labels
