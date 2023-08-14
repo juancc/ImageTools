@@ -48,7 +48,9 @@ def main(path, size, y_range, x_range, auto, quality):
         try:
             im = cropper(filepath, size=size, y_range=y_range, x_range=x_range, auto=auto)
 
-            out_filename = f'{filepath.name.split(".")[0]}.png'
+            ext = filepath.suffix
+
+            out_filename = f'{filepath.name.split(".")[0]}{ext}'
             out_filepath = os.path.join(output_dir, out_filename)
 
             cv2.imwrite(out_filepath, im,  [int(cv2.IMWRITE_JPEG_QUALITY), int(quality)])

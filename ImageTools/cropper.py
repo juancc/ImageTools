@@ -82,7 +82,9 @@ if __name__ == '__main__':
 
     im = cropper(args.path, size=size, y_range=y_range, x_range=x_range, auto=args.auto)
 
-    out_filepath = f'{args.path.split(".")[0]}_crop.png'
+    ext = args.path.split('.')[-1]
+
+    out_filepath = f'{args.path.split(".")[0]}_crop.{ext}'
 
 
     cv2.imwrite(out_filepath, im, [int(cv2.IMWRITE_JPEG_QUALITY), int(args.quality)])
