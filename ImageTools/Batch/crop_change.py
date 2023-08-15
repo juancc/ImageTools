@@ -22,10 +22,12 @@ parser.add_argument('path', help='Image path or directory containing images')
 parser.add_argument('-t', '--threshold', help='Percentage of pixels that changed to be considered a change', default=0.1)
 parser.add_argument('-m', '--min', help=' Minimum pixel chamge to be considered ', default=30)
 parser.add_argument('-u', '--hull', help='Use convex hull for mask generation', action='store_true')
+parser.add_argument('-b', '--border', help='Percentage to increase in all directions', default=0)
 
 
 
-def main(path, threshold, min_change, hull=False):
+
+def main(path, threshold, min_change, hull=False, border=0):
     output_dir = create_out_dir(path)
     files = list(Path(path).glob('**/*'))
     names = set([f.name.split('_')[0] for f in files if not f.name.startswith('.')])
@@ -42,7 +44,7 @@ def main(path, threshold, min_change, hull=False):
             im1 = cv2.imread(fgd)
 
             ret, out = crop_change(im0, im1, threshold=threshold, hull=hull,
-                                            min_change=int(min_change))
+                                            min_change=int(min_change), border=border)
             if ret:
                 out_filepath = os.path.join(output_dir, f'{n}_3.png')
 
@@ -55,4 +57,4 @@ def main(path, threshold, min_change, hull=False):
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    main(args.path,float(args.threshold), args.min, hull=args.hull)
+    main(args.path,float(args.threshold), args.min, hull=args.hull, border=float(args.border))

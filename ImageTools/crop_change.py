@@ -13,7 +13,7 @@ from ImageTools.auxfunc import show, draw_contour, get_hull
 
 
 def crop_change(bck, fgd, threshold=0.1, show_change=False, hull=False,
-                        min_change=30):
+                        min_change=30, border=0):
     """Create a PNG image from two images using their absolute difference.
         : param im0 : (np.array) background
         : param im1 : (np.array) Image to remove background
@@ -22,6 +22,7 @@ def crop_change(bck, fgd, threshold=0.1, show_change=False, hull=False,
         : param color : (tuple) color to replace the background
         : param crop : (bool) crop image arround largest contour
         : param min_change : (int) Minimum pixel chamge to be considered 
+        : param border: (float) Percentage to increase in all directions 
 
     """
     ret, thresh = is_change(bck, fgd, threshold=threshold, min_change=min_change)
@@ -48,6 +49,18 @@ def crop_change(bck, fgd, threshold=0.1, show_change=False, hull=False,
 
     # Crop around largest contour
     x,y,w,h  = cv2.boundingRect(main_contour)
+    if border:
+        dx = border * w/2
+        dy = border * h/2
+        x = int(max(0, x-dx))
+        y = int(max(0, y-dy))
+
+        w = w+dx if x+w+dx < fgd.shape[1] else fgd.shape[1]-x
+        h = h+dy if y+h+dy < fgd.shape[0] else fgd.shape[0]-y
+
+        w = int(w)
+        h = int(h)
+
     if show_change:
         cv2.rectangle(fgd,(x,y),(x+w,y+h),(0,255,0),2)
         show(fgd)
@@ -75,6 +88,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
     parser.add_argument('-u', '--hull', help='Use convex hull for mask generation', action='store_true')
+    parser.add_argument('-b', '--border', help='Percentage to increase in all directions', default=0)
+
 
 
 
@@ -87,7 +102,9 @@ if __name__ == '__main__':
     ret, ans = crop_change(im0, im1, threshold=float(args.threshold), 
                                    show_change=args.show,
                                    hull=args.hull,
-                                   min_change=int(args.min))
+                                   min_change=int(args.min),
+                                   border=float(args.border),
+                                   )
 
     out_filepath = f'{args.im0.split(".")[0]}_out.png'
 

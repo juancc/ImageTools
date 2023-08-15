@@ -8,7 +8,7 @@ import cv2
 
 from ImageTools.auxfunc import show
 
-def is_change(im0, im1, threshold=0.1, show_change=False, min_change=30):
+def is_change(im0, im1, threshold=0.1, show_change=False, min_change=30, method='lab'):
     """Detect if there is a change between two images. The change is calculated by the absolute 
     difference between the images. If the change is greater than a value is counted as if the pixel changes.
     Return True if the number of pixels that changed are greated thant the thresh parameter.
@@ -28,14 +28,46 @@ def is_change(im0, im1, threshold=0.1, show_change=False, min_change=30):
         raise ValueError(f'Image dimension most be the same: Image sizes: {im0.shape} and {im0.shape}')
     
     # # HSV Version
-    # hsv0 = cv2.cvtColor(im0, cv2.COLOR_BGR2HSV)
-    # hsv1 = cv2.cvtColor(im1, cv2.COLOR_BGR2HSV)
-    # diff = cv2.absdiff(hsv0[:,:,:-1], hsv1[:,:,:-1])
-    # diff = np.max(diff, axis=2)
+    if method == 'hsv':
+        hsv0 = cv2.cvtColor(im0, cv2.COLOR_BGR2HSV)
+        hsv1 = cv2.cvtColor(im1, cv2.COLOR_BGR2HSV)
+        diff = cv2.absdiff(hsv0[:,:,:-1], hsv1[:,:,:-1])
+        diff = np.max(diff, axis=2)
 
-    # # RGB version
-    diff = cv2.absdiff(im0, im1)
-    diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+    # # LAB 
+    if method == 'lab':
+        # # in LAB there are 2 color channels and 1 brightness channel:
+        # #   L-channel: Brightness value in the image
+        # #   A-channel: Red and green color in the image
+        # #   B-channel: Blue and yellow color in the image
+        lab0 = cv2.cvtColor(im0, cv2.COLOR_BGR2LAB)
+        lab1 = cv2.cvtColor(im1, cv2.COLOR_BGR2LAB)
+        diff_a = cv2.absdiff(lab0[:,:,1], lab1[:,:,1])
+        diff_b = cv2.absdiff(lab0[:,:,2], lab1[:,:,2])
+        diff = diff_a * diff_b
+        diff = cv2.dilate(diff,(5,5),iterations=1)
+    
+    if method == 'rgb':
+        # RGB version
+        diff = cv2.absdiff(im0, im1)
+        diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+    
+
+    # Edges
+    # edges_diff = cv2.Canny(diff,100,200)
+    # edges0 = cv2.Canny(im0,100,200)
+    # edges1 = cv2.Canny(im1,100,200)
+    
+    # diff = edges1-edges0
+    # opening = cv2.morphologyEx(diff, cv2.MORPH_OPEN, (5,5))
+
+    # M = cv2.moments(opening)
+ 
+    # # calculate x,y coordinate of center
+    # cX = int(M["m10"] / M["m00"])
+    # cY = int(M["m01"] / M["m00"])
+    # cv2.circle(im1, (cX, cY), 5, (255, 255, 255), -1)
+    # exit()
     
     
     thresh = cv2.threshold(
