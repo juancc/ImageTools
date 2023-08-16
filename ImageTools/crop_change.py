@@ -49,20 +49,23 @@ def crop_change(bck, fgd, threshold=0.1, show_change=False, hull=False,
 
     # Crop around largest contour
     x,y,w,h  = cv2.boundingRect(main_contour)
+    x_i, y_i, w_i, h_i = x,y,w,h 
     if border:
         dx = border * w/2
         dy = border * h/2
         x = int(max(0, x-dx))
         y = int(max(0, y-dy))
 
-        w = w+dx if x+w+dx < fgd.shape[1] else fgd.shape[1]-x
-        h = h+dy if y+h+dy < fgd.shape[0] else fgd.shape[0]-y
+        w = w+2*dx if x+w+2*dx < fgd.shape[1] else fgd.shape[1]-x
+        h = h+2*dy if y+h+2*dy < fgd.shape[0] else fgd.shape[0]-y
 
         w = int(w)
         h = int(h)
 
     if show_change:
         cv2.rectangle(fgd,(x,y),(x+w,y+h),(0,255,0),2)
+        cv2.rectangle(fgd,(x_i,y_i),(x_i+w_i,y_i+h_i),(0,255,0),2)
+
         show(fgd)
     out = fgd[y:y+h, x:x+w]
 
