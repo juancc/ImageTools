@@ -6,7 +6,8 @@ JCA
 import numpy as np
 import cv2
 
-from ImageTools.auxfunc import show
+from ImageTools.auxfunc import show, get_hull
+
 
 def is_change(im0, im1, threshold=0.1, show_change=False, min_change=30, method='lab'):
     """Detect if there is a change between two images. The change is calculated by the absolute 
@@ -51,7 +52,7 @@ def is_change(im0, im1, threshold=0.1, show_change=False, min_change=30, method=
         # RGB version
         diff = cv2.absdiff(im0, im1)
         diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
-    
+ 
 
     # Edges
     # edges_diff = cv2.Canny(diff,100,200)
@@ -86,6 +87,35 @@ def is_change(im0, im1, threshold=0.1, show_change=False, min_change=30, method=
 
     return changed>threshold, thresh
 
+
+
+def find_contour(bck, fgd, threshold=0.1, hull=False, min_change=30, method='lab'):
+    """
+    Return main contour using is_change function
+        : param im0 : (np.array) background
+        : param im1 : (np.array) Image to remove background
+        : param threshold : (int) Percentage of pixels that changed to be considered a change
+        : param color : (tuple) color to replace the background
+        : param crop : (bool) crop image arround largest contour
+        : param min_change : (int) Minimum pixel chamge to be considered 
+
+    """
+    ret, thresh = is_change(bck, fgd, threshold=threshold, min_change=min_change, method=method)
+
+    # If there is not change return None
+    if not ret:
+        print('There is not change between the images')
+        return False, None, None
+    
+
+    # Dilate to get internal parts
+    dilation = cv2.dilate(thresh, (5,5), iterations=1)
+
+    # Find contours to only get the largest one
+    contours, hierarchy = cv2.findContours(dilation.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    hull, hull_area, hull_center, main_contour = get_hull(contours, convex_hull=hull)
+
+    return hull, hull_center, main_contour
 
 
 

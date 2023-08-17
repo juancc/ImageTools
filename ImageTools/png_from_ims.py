@@ -6,14 +6,14 @@ JCA
 import numpy as np
 import cv2
 
-from ImageTools.difference import is_change
+from ImageTools.difference import find_contour
 from ImageTools.auxfunc import show, draw_contour, get_hull
-
+from ImageTools.crop_change import get_coords
 
 
 def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False, 
-                        color=(255,255,255), crop=False, keep_bg=False, hull=False,
-                        min_change=30):
+                        color=(255,255,255), crop=False, keep_bg=False, use_hull=False,
+                        min_change=30, method='lab', border=0):
     """Create a PNG image from two images using their absolute difference.
         : param im0 : (np.array) background
         : param im1 : (np.array) Image to remove background
@@ -22,21 +22,21 @@ def create_png_from_ims(bck, fgd, threshold=0.1, show_change=False,
         : param color : (tuple) color to replace the background
         : param crop : (bool) crop image arround largest contour
         : param min_change : (int) Minimum pixel chamge to be considered 
+        : param border: (float) Percentage to increase in all directions when lab-rgb is used
 
     """
-    ret, thresh = is_change(bck, fgd, threshold=threshold, min_change=min_change)
+    # Uses one method first to crop a ROI
+    # Later uses the second to segment and generate alpha
+    if '-' in method:
+        crop_method, method = method.split('-')
+        hull, hull_center, main_contour = find_contour(bck, fgd, threshold, use_hull, min_change, crop_method)
+        x,y,w,h = get_coords(main_contour, fgd.shape[1], fgd.shape[0], border)
+        fgd = fgd[y:y+h, x:x+w]
+        bck = bck[y:y+h, x:x+w]
 
-    # If there is not change return None
-    if not ret:
-        print('There is not change between the images')
-        return False, None
-    
-    # Dilate to get internal parts
-    dilation = cv2.dilate(thresh, (5,5), iterations=1)
 
-    # Find contours to only get the largest one
-    contours, hierarchy = cv2.findContours(dilation.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    hull, hull_area, hull_center, main_contour = get_hull(contours, convex_hull=hull)
+    hull, hull_center, main_contour = find_contour(bck, fgd, threshold, use_hull, min_change, method)
+
     
     alpha = np.zeros(fgd.shape)
     alpha = draw_contour(alpha, hull, hull_center, color=255, thickness=-1)[:,:,0]
@@ -86,6 +86,8 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--crop', help='Crop image around largest contour', action='store_true')
     parser.add_argument('-b', '--background', help='Keep image background', action='store_true')
     parser.add_argument('-u', '--hull', help='Use convex hull for mask generation', action='store_true')
+    parser.add_argument('-d', '--method', help='Method to perform the segmentation', default='rgb')
+
 
 
 
@@ -100,7 +102,7 @@ if __name__ == '__main__':
 
     ret, ans = create_png_from_ims(im0, im1, threshold=float(args.threshold), 
                                    show_change=args.show, crop=args.crop, keep_bg=args.background,
-                                   hull=args.hull,
+                                   use_hull=args.hull,
                                    min_change=int(args.min))
 
     out_filepath = f'{args.im0.split(".")[0]}_out.png'

@@ -7,13 +7,31 @@ JCA
 import numpy as np
 import cv2
 
-from ImageTools.difference import is_change
+from ImageTools.difference import find_contour
 from ImageTools.auxfunc import show, draw_contour, get_hull
 
 
+def get_coords(main_contour, width, height, border=0):
+    """Return bounding box coordinates based the contour. 
+        return (x,y,w,h): x and y are the initial coordinates
+    """
+    x,y,w,h  = cv2.boundingRect(main_contour)
+    x_i, y_i, w_i, h_i = x,y,w,h 
+    if border:
+        dx = border * w/2
+        dy = border * h/2
+        x = int(max(0, x-dx))
+        y = int(max(0, y-dy))
+
+        w = w+2*dx if x+w+2*dx < width else width-x
+        h = h+2*dy if y+h+2*dy < height else height-y
+
+        w = int(w)
+        h = int(h)
+    return x,y,w,h
 
 def crop_change(bck, fgd, threshold=0.1, show_change=False, hull=False,
-                        min_change=30, border=0):
+                        min_change=30, border=0, method='lab'):
     """Create a PNG image from two images using their absolute difference.
         : param im0 : (np.array) background
         : param im1 : (np.array) Image to remove background
@@ -25,20 +43,8 @@ def crop_change(bck, fgd, threshold=0.1, show_change=False, hull=False,
         : param border: (float) Percentage to increase in all directions 
 
     """
-    ret, thresh = is_change(bck, fgd, threshold=threshold, min_change=min_change)
-
-    # If there is not change return None
-    if not ret:
-        print('There is not change between the images')
-        return False, None
     
-    # Dilate to get internal parts
-    dilation = cv2.dilate(thresh, (5,5), iterations=1)
-
-    # Find contours to only get the largest one
-    contours, hierarchy = cv2.findContours(dilation.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    hull, hull_area, hull_center, main_contour = get_hull(contours, convex_hull=hull)
-    
+    hull, hull_center, main_contour = find_contour(bck, fgd, threshold, hull, min_change, method)
 
     if show_change:
         alpha = np.zeros(fgd.shape)
@@ -47,24 +53,13 @@ def crop_change(bck, fgd, threshold=0.1, show_change=False, hull=False,
         im_change[alpha.astype(bool)] = (0,255,0)
         show(im_change)
 
-    # Crop around largest contour
-    x,y,w,h  = cv2.boundingRect(main_contour)
-    x_i, y_i, w_i, h_i = x,y,w,h 
-    if border:
-        dx = border * w/2
-        dy = border * h/2
-        x = int(max(0, x-dx))
-        y = int(max(0, y-dy))
-
-        w = w+2*dx if x+w+2*dx < fgd.shape[1] else fgd.shape[1]-x
-        h = h+2*dy if y+h+2*dy < fgd.shape[0] else fgd.shape[0]-y
-
-        w = int(w)
-        h = int(h)
+    # Find largest contour
+    # Crop rectangle around largest contour
+    x,y,w,h = get_coords(main_contour, fgd.shape[1], fgd.shape[0], border)
 
     if show_change:
         cv2.rectangle(fgd,(x,y),(x+w,y+h),(0,255,0),2)
-        cv2.rectangle(fgd,(x_i,y_i),(x_i+w_i,y_i+h_i),(0,255,0),2)
+        # cv2.rectangle(fgd,(x_i,y_i),(x_i+w_i,y_i+h_i),(0,255,0),2)
 
         show(fgd)
     out = fgd[y:y+h, x:x+w]
