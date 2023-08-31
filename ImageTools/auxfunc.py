@@ -36,7 +36,7 @@ def auto_thresh(im):
 
 
 
-def automatic_contour(im, bck='auto', convex_hull=True, **kwargs):
+def automatic_contour(im, bck='auto', convex_hull=True, min_white=30, **kwargs):
     """Contour is calculated automatic for images witout information
     Return object contour, area and centroid base background-object segmentation
         :param im: (np.array) image loaded for cv2
@@ -59,7 +59,7 @@ def automatic_contour(im, bck='auto', convex_hull=True, **kwargs):
 
         hsv = cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
 
-        min = np.array([0, 30, 30],np.uint8) 
+        min = np.array([0, min_white, min_white],np.uint8) 
         max = np.array([255, 255, 255],np.uint8) 
         th = cv2.inRange(hsv, min, max)
 
