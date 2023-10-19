@@ -46,8 +46,8 @@ def main(path, quality, scale=None):
             # TODO:
             # Implement other scale input types
             else:
-                print('Not scale provided')
-                exit()
+                # Only reduce image quality
+                out = im
 
 
 
