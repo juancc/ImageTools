@@ -24,23 +24,24 @@ parser.add_argument('-m', '--min', help=' Minimum pixel chamge to be considered 
 parser.add_argument('-u', '--hull', help='Use convex hull for mask generation', action='store_true')
 parser.add_argument('-b', '--border', help='Percentage to increase in all directions', default=0)
 parser.add_argument('-s', '--show', help='Show changes on image for visual debugging', action='store_true')
+parser.add_argument('-k', '--marker', help='String to identify the second image', default='_1')
 
 
 
 
 
-def main(path, threshold, min_change, hull=False, border=0, show_change=False):
-    output_dir = create_out_dir(path)
+def main(path, threshold, min_change, hull=False, border=0, show_change=False, new_marker='_1'):
+    output_dir = create_out_dir(path, tag=f'out{new_marker}')
     files = list(Path(path).glob('**/*'))
     names = set([f.name.split('_')[0] for f in files if not f.name.startswith('.')])
 
     ext = files[0].suffix
+    errs = []
 
     for n in tqdm(names):
-        errs = []
         try:
             bck = os.path.join(path, f'{n}_0{ext}')
-            fgd = os.path.join(path, f'{n}_1{ext}')
+            fgd = os.path.join(path, f'{n}{new_marker}{ext}')
 
             im0 = cv2.imread(bck)
             im1 = cv2.imread(fgd)
@@ -67,5 +68,6 @@ if __name__ == '__main__':
          args.min,
            hull=args.hull, 
            border=float(args.border),
-           show_change=args.show
+           show_change=args.show,
+           new_marker=args.marker,
            )
