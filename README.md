@@ -176,3 +176,21 @@ Tools for Machine Learning image datasets processing.
 
 ## Png from COCO
 Generate transparency image using COCO segmentation labels
+
+
+# Image Analyzers
+Scripts for performing color and shape image analysis
+
+## Histogram
+Calculates and display image color histogram
+
+
+![alt text](https://github.com/juancc/ImageTools/blob/main/Assets/Img/ex_color_histogram.png?raw=true)
+
+
+### Usage: 
+```bash
+ python -m ShowHistogram [-h] im_path
+```
+
+
